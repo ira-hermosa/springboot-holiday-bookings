@@ -8,15 +8,15 @@ import com.qa.holiday.repo.Repo;
 //Annotation tells Spring this is our Services class
 //Services is the business Logic, pushing data to database / arrayList, updating deleting etc.
 
-@Service
-public class Services {
+//@Service
+public class ServicesNOTINUSE {
 	
 	//Specify that we want to use our repo class
 	
 	private Repo repo;
 	
 	//When spring creates the Service Object/bean, it takes in our repo class
-	public Services(Repo repo) {
+	public ServicesNOTINUSE(Repo repo) {
 		super();
 		this.repo = repo;
 	}

@@ -1,6 +1,7 @@
 package com.qa.holiday.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qa.holiday.model.HolidayBooking;
-import com.qa.holiday.services.Services;
+import com.qa.holiday.services.ServiceDB;
+import com.qa.holiday.services.ServicesNOTINUSE;
 
 //If you have multiple classes with annotation @RestController, Spring will use the first one it finds
 
@@ -31,11 +33,11 @@ public class ControllerResponseEntity {
 	
 // Tell our Controller to use the Services Object
 // When Spring creates our Controller, it passes in the Service object	
-private Services service;
+private ServiceDB service;
 
 
 // Constructor
-public ControllerResponseEntity(Services service) {
+public ControllerResponseEntity(ServiceDB service) {
 	super();
 	this.service = service;
 }
@@ -44,8 +46,7 @@ public ControllerResponseEntity(Services service) {
 @PostMapping ("/createBooking")
 public ResponseEntity<String> createBooking(@RequestBody HolidayBooking booking) {
 // Call the method in the Services class
-//service.createBooking(booking);
-service.createBookingDb(booking);
+service.createBooking(booking);
 
 		
 //returns a response entity<data it contains>
@@ -54,10 +55,10 @@ return response;
 	}
 	
 	
-@GetMapping("/get/{index}")
-public ResponseEntity<HolidayBooking> getByIndex(@PathVariable("index") int index) {
+@GetMapping("/get/{id}")
+public ResponseEntity<HolidayBooking> getById(@PathVariable("id") int id) {
 //Making an object variable called result = the data we're retrieving
-HolidayBooking result = service.getByIndex(index);
+HolidayBooking result = service.getById(id);
 		
 // Making a ResponseEntity that contains the data we're sending
 ResponseEntity<HolidayBooking> response = new ResponseEntity<>(result, HttpStatus.ACCEPTED);
@@ -67,28 +68,35 @@ return response;
 	
 
 @GetMapping("/getBookings")
-public ResponseEntity<ArrayList<HolidayBooking>> getBookings(){
-	ArrayList<HolidayBooking> response = service.getBookings();
+public ResponseEntity<List<HolidayBooking>> getBookings(){
+	List<HolidayBooking> response = service.getBookings();
 	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 }
 
 
 
-@DeleteMapping("/delete/{index}")
+@DeleteMapping("/delete/{id}")
 public ResponseEntity<String> deleteByIndex(@PathVariable("index") int index) {
-		service.deleteByIndex(index);
-		String response = "Booking of index: " + index + "deleted";
-		return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+	service.deleteById(index);
+	String response = "Booking of index: " + index + "deleted";
+	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 			
 	}
 	
 	
-@PutMapping("/update/{index}")
+@PutMapping("/update/{id}")
 public ResponseEntity<String>update(@PathVariable("index")int index, @RequestBody HolidayBooking booking) {
 	service.update(index, booking);
 	String response = "Booking of index: " + index + "has been updated";
 	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 	
+}
+
+@DeleteMapping("/deleteAll")
+public ResponseEntity<String>deleteAll(){
+	service.deleteAll();
+	String response = "All bookings have been deleted";
+	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 }
 
 @PostMapping("/postArray")
@@ -97,13 +105,6 @@ public ResponseEntity<ArrayList<HolidayBooking>> addArrayBookings(@RequestBody H
 	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 	}
 
-
-@DeleteMapping("/deleteAll")
-public ResponseEntity<String>deleteAll(){
-	service.deleteAll();
-	String response = "All bookings have been deleted";
-	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
-}
 }
 
 
