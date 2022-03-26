@@ -1,10 +1,9 @@
 package com.qa.holiday.services;
 
+
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import com.qa.holiday.model.HolidayBooking;
 import com.qa.holiday.repo.Repo;
 
@@ -12,6 +11,7 @@ import com.qa.holiday.repo.Repo;
 public class ServiceDB {
 	
 	private Repo repo;
+	
 
 	public ServiceDB(Repo repo) {
 		super();
@@ -45,7 +45,7 @@ public class ServiceDB {
 		
 	}
 
-	public void update(long id, HolidayBooking booking) {
+	public HolidayBooking update(long id, HolidayBooking booking) {
 		
 		//Find the object we want to update
 		HolidayBooking oldBooking = getById(id);
@@ -57,7 +57,8 @@ public class ServiceDB {
 		oldBooking.setAllInclusive(booking.isAllInclusive());
 		
 		//Saving this old Booking
-		repo.save(oldBooking);
+		return repo.save(oldBooking);
+		
 		
 	}
 
@@ -71,8 +72,59 @@ public class ServiceDB {
 		return (ArrayList<HolidayBooking>) repo.saveAll(bookingList);
 	
 }
-
-
 	
+	// Query to return all objects with a country value of x 
+		public List<HolidayBooking> getByCountry(String country){
+			// Get a list of all holiday bookings
+			// looping through all of the objects
+			// If holidayBooking.getCountry == country -> save it to a list
+			// Use JpaRepository custom queries -> Repo file
+			
+			for (HolidayBooking booking: repo.findAll()) {
+				if (booking.getCountry()==country.toLowerCase()) {
+				} 
+			}return repo.findByCountry(country);
+			
+			
+		}
+		
+		public List<HolidayBooking> getByPriceGreater(float price){
+			
+			for (HolidayBooking booking: repo.findAll()) {
+				if (booking.getPrice()>price) {
+					
+				}
+			}return repo.findByPriceGreaterThan(price);
+			
+			
+		}
+				
+		public List<HolidayBooking> getByAllInclusive(boolean bool){
+			for (HolidayBooking booking: repo.findAll()) {
+				if (booking.isAllInclusive() == bool) {
+			
+		}
+				}return repo.findByAllInclusive(bool);
+		}
+		
+		
+	
+		public List<HolidayBooking> findByWeather (String weather){
+			for (HolidayBooking booking: repo.findAll()) {
+				if (booking.getWeather()==weather.toLowerCase()) {
+					
+				}
+			}return repo.findByWeather(weather);
+			
+		}
+	
+		public List<HolidayBooking>getAllOrderByCountry(){
+			return repo.findByOrderByCountryAsc();
+		}
+		
+		public List<HolidayBooking>getByOrderByPriceDesc(){
+			return repo.findByOrderByPriceDesc();
+		}
+
 
 }

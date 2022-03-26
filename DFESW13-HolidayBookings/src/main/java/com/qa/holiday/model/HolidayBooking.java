@@ -126,6 +126,15 @@ public class HolidayBooking {
 				&& Objects.equals(weather, other.weather);
 	}
 
+
+	@Override
+	public String toString() {
+		return "HolidayBooking [id=" + id + ", country=" + country + ", weather=" + weather + ", price=" + price
+				+ ", allInclusive=" + allInclusive + "]";
+	}
+	
+	
+
 	
 
 	
