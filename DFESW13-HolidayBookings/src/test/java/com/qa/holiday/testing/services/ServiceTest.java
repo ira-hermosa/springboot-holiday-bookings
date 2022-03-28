@@ -1,5 +1,6 @@
 package com.qa.holiday.testing.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,11 +30,14 @@ public class ServiceTest {
 	//Test objects I can pass into methods and have my repo return them
 	HolidayBooking booking1 = new HolidayBooking("country1", "weather 1", 1, true);
 	HolidayBooking booking2 = new HolidayBooking("country2", "weather 2", 2, true);
-	HolidayBooking booking3 = new HolidayBooking("country3", "weather 3", 3, true);
+	HolidayBooking booking3 = new HolidayBooking("country3", "weather 3", 3, false);
+	HolidayBooking booking4 = new HolidayBooking("country4", "weather 4", 4, false);
 	
 	//Objects for when we return them from our repo
-	HolidayBooking booking1ID = new HolidayBooking(1l,"country4", "weather 4", 4, true);
-	HolidayBooking booking2ID = new HolidayBooking(2l,"country5", "weather 5", 5, true);
+	HolidayBooking booking1ID = new HolidayBooking(1l,"country1", "weather 1", 1, true);
+	HolidayBooking booking2ID = new HolidayBooking(2l,"country2", "weather 2", 2, true);
+	HolidayBooking booking3ID = new HolidayBooking(3l,"country3", "weather 3", 3, false);
+	HolidayBooking booking4ID = new HolidayBooking(4l,"country4", "weather 4", 4, true);
 	
 	@Test
 	public void testCreate() {
@@ -57,8 +61,21 @@ public class ServiceTest {
 	}
 	
 	@Test
-	public void testGetById() {
+	public void testCreateMultipleBookings() {
+		List<HolidayBooking>testList = List.of(booking1, booking2, booking3, booking4);
+		Mockito.when(repo.findAll()).thenReturn(testList);
+		List<HolidayBooking>testListDatabase = List.of(booking1ID, booking2ID, booking3ID, booking4ID);
+		Mockito.when(repo.saveAll(testList)).thenReturn(testListDatabase);
+		List<HolidayBooking> result = service.addArrayBookings(testList);
+		Assertions.assertEquals(testListDatabase, result);
+		Mockito.verify(repo, Mockito.never()).flush();
 		
+	}
+	
+	
+	
+	@Test
+	public void testGetById() {
 		
 		//Arrange
 		//The following test returns NullPointerException
@@ -95,6 +112,20 @@ public class ServiceTest {
 	}
 	
 	@Test
+	public void testUpdate() {
+		
+		HolidayBooking oldBooking = booking2ID;
+		oldBooking.setCountry("new country");
+		oldBooking.setPrice(75);
+		oldBooking.setWeather("new weather");
+		Mockito.when(repo.findById(2l)).thenReturn(Optional.of(booking2ID));
+		Mockito.when(repo.save(oldBooking)).thenReturn(oldBooking);
+		HolidayBooking result = service.update(2l, oldBooking);
+		Assertions.assertEquals(oldBooking, result);
+		Mockito.verify(repo,Mockito.never()).count();
+	}
+	
+	@Test
 	public void testDeleteById() {
 		//Arrange
 		
@@ -123,26 +154,24 @@ public class ServiceTest {
 	}
 	
 	@Test
-	public void testUpdate() {
-		//Arrange
-		Mockito.when(repo.findById(2l)).thenReturn(Optional.of(booking2ID));
-		
+	public void testGetByCountry() {
+		List<HolidayBooking> testList = new ArrayList<HolidayBooking>();
+		testList.add(booking1ID);
+		Mockito.when(repo.findByCountry("country1")).thenReturn(testList);
+		List<HolidayBooking> result = service.getByCountry("country1");
+		Assertions.assertEquals(testList, result);
+		Mockito.verify(repo, Mockito.never()).flush();
+	}
 	
-		//Act
-		HolidayBooking oldBooking = booking2ID;
-//		HolidayBooking newBooking = new HolidayBooking();
-		
-		
-		oldBooking.setCountry("new country");
-		oldBooking.setPrice(75);
-		oldBooking.setWeather("new weather");
-		
-		repo.save(oldBooking);
-		
-		HolidayBooking result = service.update(2l, oldBooking);
-		
-		//Assert
-		Assertions.assertEquals(oldBooking, result);
+	@Test
+	public void testGetPriceGreater() {
+		List<HolidayBooking> testList = List.of(booking2,booking3,booking4);
+		Mockito.when(repo.findAll()).thenReturn(testList);
+		List<HolidayBooking> testListDatabase = List.of(booking2ID,booking3ID,booking4ID);
+		Mockito.when(repo.saveAll(testList)).thenReturn(testListDatabase);
+		List<HolidayBooking> result = service.getByPriceGreater(1);
+		Assertions.assertEquals(testList, result);
+		Mockito.verify(repo, Mockito.never()).count();
 	}
 
 }

@@ -22,15 +22,10 @@ import com.qa.holiday.services.ServiceDB;
 @RestController
 public class ControllerResponseEntity {
 	
-// Not using the ArrayList in the controller anymore. This has now been added to the Services class
-// private ArrayList<HolidayBooking> bookingList = new ArrayList<>();
-	
 // Response Entities offer more info when sending a response back
 // Response includes a message AND a status code we can specify AND the data it requested
 		
-// Sending a Delete Request, we respond with "Deleted ID of x" AND code 202 
-// Sending a Get request, we respond with the Data requested AND a status code 200
-	
+
 // Tell our Controller to use the Services Object
 // When Spring creates our Controller, it passes in the Service object	
 private ServiceDB service;
@@ -47,44 +42,35 @@ public ControllerResponseEntity(ServiceDB service) {
 public ResponseEntity<String> createBooking(@RequestBody HolidayBooking booking) {
 // Call the method in the Services class
 service.createBooking(booking);
-
-		
+String response = "Booking added with ID: " + booking.getId();
 //returns a response entity<data it contains>
-ResponseEntity<String> response = new ResponseEntity<String>("Booking added with ID: " + booking.getId(), HttpStatus.CREATED);
-return response;
+return new ResponseEntity<>(response, HttpStatus.CREATED);
+}
+
+@PostMapping("/postArray")
+public ResponseEntity<String> addArrayBookings(@RequestBody List<HolidayBooking> bookingArray) {
+	service.addArrayBookings(bookingArray);
+	String response = "Bookings have been created";
+	return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 	
 	
 @GetMapping("/get/{id}")
 public ResponseEntity<HolidayBooking> getById(@PathVariable("id") long id) {
 //Making an object variable called result = the data we're retrieving
-HolidayBooking result = service.getById(id);
+HolidayBooking response = service.getById(id);
+//Making a ResponseEntity that contains the data we're sending
+return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 		
-// Making a ResponseEntity that contains the data we're sending
-ResponseEntity<HolidayBooking> response = new ResponseEntity<>(result, HttpStatus.ACCEPTED);
-return response;
-		
-	}
+}
 	
-
 @GetMapping("/getBookings")
 public ResponseEntity<List<HolidayBooking>> getBookings(){
 	List<HolidayBooking> response = service.getBookings();
 	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+	
 }
 
-
-
-@DeleteMapping("/delete/{id}")
-public ResponseEntity<String>deleteById(@PathVariable("id") long id) {
-	service.deleteById(id);
-	String response = "Booking of id: " + id + " " + "deleted";
-	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
-	
-			
-	}
-	
-	
 @PutMapping("/update/{id}")
 public ResponseEntity<String>update(@PathVariable("id")long id, @RequestBody HolidayBooking booking) {
 	service.update(id, booking);
@@ -93,6 +79,14 @@ public ResponseEntity<String>update(@PathVariable("id")long id, @RequestBody Hol
 	
 }
 
+@DeleteMapping("/delete/{id}")
+public ResponseEntity<String>deleteById(@PathVariable("id") long id) {
+	service.deleteById(id);
+	String response = "Booking of id: " + id + " " + "deleted";
+	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+	
+	}
+	
 @DeleteMapping("/deleteAll")
 public ResponseEntity<String>deleteAll(){
 	service.deleteAll();
@@ -100,11 +94,7 @@ public ResponseEntity<String>deleteAll(){
 	return new ResponseEntity<>(response, HttpStatus.CREATED);
 }
 
-@PostMapping("/postArray")
-public ResponseEntity<List<HolidayBooking>> addArrayBookings(@RequestBody HolidayBooking[] bookingArray) {
-	ArrayList<HolidayBooking> response = service.addArrayBookings(bookingArray);
-	return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
-	}
+
 
 //Method to get all bookings with a country value of x
 	@GetMapping("/getCountry/{country}")

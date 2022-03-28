@@ -12,7 +12,6 @@ public class ServiceDB {
 	
 	private Repo repo;
 	
-
 	public ServiceDB(Repo repo) {
 		super();
 		this.repo = repo;
@@ -22,6 +21,15 @@ public class ServiceDB {
 		repo.save(booking); // Takes in an entity, and puts in the DB
 		return true;
 	}
+	
+	public List<HolidayBooking> addArrayBookings(List<HolidayBooking> bookingArray) {
+		List<HolidayBooking>bookingList = new ArrayList<>();
+		for (HolidayBooking booking: bookingArray) {
+			bookingList.add(booking);
+		}
+		return (List<HolidayBooking>) repo.saveAll(bookingList);
+	
+}
 
 	public HolidayBooking getById(long id) {
 		return repo.findById(id).get();
@@ -62,29 +70,16 @@ public class ServiceDB {
 		
 	}
 
-	public ArrayList<HolidayBooking> addArrayBookings(HolidayBooking[] bookingArray) {
-		
-		ArrayList<HolidayBooking>bookingList = new ArrayList<>();
-		
-		for (HolidayBooking booking: bookingArray) {
-			bookingList.add(booking);
-		}
-		return (ArrayList<HolidayBooking>) repo.saveAll(bookingList);
-	
-}
-	
 	// Query to return all objects with a country value of x 
 		public List<HolidayBooking> getByCountry(String country){
 			// Get a list of all holiday bookings
 			// looping through all of the objects
 			// If holidayBooking.getCountry == country -> save it to a list
 			// Use JpaRepository custom queries -> Repo file
-			
 			for (HolidayBooking booking: repo.findAll()) {
-				if (booking.getCountry()==country.toLowerCase()) {
+				if (booking.getCountry()==country) {
 				} 
 			}return repo.findByCountry(country);
-			
 			
 		}
 		
@@ -95,7 +90,6 @@ public class ServiceDB {
 					
 				}
 			}return repo.findByPriceGreaterThan(price);
-			
 			
 		}
 				
