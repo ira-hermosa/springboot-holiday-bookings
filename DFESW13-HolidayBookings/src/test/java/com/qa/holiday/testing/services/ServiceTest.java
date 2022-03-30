@@ -163,15 +163,41 @@ public class ServiceTest {
 		Mockito.verify(repo, Mockito.never()).flush();
 	}
 	
+	
 	@Test
 	public void testGetPriceGreater() {
-		List<HolidayBooking> testList = List.of(booking2,booking3,booking4);
-		Mockito.when(repo.findAll()).thenReturn(testList);
-		List<HolidayBooking> testListDatabase = List.of(booking2ID,booking3ID,booking4ID);
-		Mockito.when(repo.saveAll(testList)).thenReturn(testListDatabase);
+
+		List<HolidayBooking> testList = new ArrayList<HolidayBooking>();
+		testList.add(booking2ID);
+		testList.add(booking3ID);
+		testList.add(booking4ID);
+		Mockito.when(repo.findByPriceGreaterThan(1)).thenReturn(testList);
 		List<HolidayBooking> result = service.getByPriceGreater(1);
+		Assertions.assertEquals(testList, result);
+		Mockito.verify(repo, Mockito.never()).flush();
+	}
+	
+	@Test
+	public void testFindByWeather() {
+		List<HolidayBooking> testList = new ArrayList<HolidayBooking>();
+		testList.add(booking2ID);
+		Mockito.when(repo.findByWeather("weather 2")).thenReturn(testList);
+		List<HolidayBooking> result = service.findByWeather("weather 2");
+		Assertions.assertEquals(testList, result);
+		Mockito.verify(repo, Mockito.never()).flush();
+		
+	}
+
+	@Test
+	public void testGetByAllInclusive() {
+//		List<HolidayBooking> testList = List.of(booking1ID, booking3ID, booking4ID);
+		List<HolidayBooking> testList = new ArrayList<HolidayBooking>();
+		testList.add(booking1ID);
+		testList.add(booking3ID);
+		testList.add(booking4ID);
+		Mockito.when(repo.findByAllInclusive(true)).thenReturn(testList);
+		List<HolidayBooking> result = service.getByAllInclusive(true);
 		Assertions.assertEquals(testList, result);
 		Mockito.verify(repo, Mockito.never()).count();
 	}
-
 }

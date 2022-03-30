@@ -105,7 +105,7 @@ public class ServiceDB {
 	
 		public List<HolidayBooking> findByWeather (String weather){
 			for (HolidayBooking booking: repo.findAll()) {
-				if (booking.getWeather()==weather.toLowerCase()) {
+				if (booking.getWeather()==weather) {
 					
 				}
 			}return repo.findByWeather(weather);
