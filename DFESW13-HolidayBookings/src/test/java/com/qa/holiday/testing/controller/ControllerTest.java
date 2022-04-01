@@ -46,20 +46,23 @@ public class ControllerTest {
 	private ObjectMapper mapper;//Converts Java Objects to JSON Strings {"country": "wales", "weather": "rainy"}
 	
 	//Test Objects
-	HolidayBooking testBooking3 = new HolidayBooking("test country", "test weather", 3, true);
-	HolidayBooking testBooking4 = new HolidayBooking("test country", "test weather", 4, true);
-	HolidayBooking testBooking5 = new HolidayBooking("test country", "test weather", 5, true);
+	HolidayBooking booking1 = new HolidayBooking("country1", "weather1", 1, true);
+	HolidayBooking booking2 = new HolidayBooking("country2", "weather2", 2, true);
+	HolidayBooking booking3 = new HolidayBooking("country3", "weather3", 3, false);
+	HolidayBooking booking4 = new HolidayBooking("country4", "weather4", 4, false);
 	
 	//The following objects will be used to get data out of database, hence we need the id. These should reflect the test-data.sql
-	HolidayBooking testBookingID = new HolidayBooking(1l, "country1", "weather1", 1, true);
-	HolidayBooking testBookingID2 = new HolidayBooking(2l, "country2", "weather2", 2, true);
+	HolidayBooking booking1ID = new HolidayBooking(1l,"country1", "weather1", 1, true);
+	HolidayBooking booking2ID = new HolidayBooking(2l,"country2", "weather2", 2, true);
+	HolidayBooking booking3ID = new HolidayBooking(3l,"country3", "weather3", 3, false);
+	HolidayBooking booking4ID = new HolidayBooking(4l,"country4", "weather4", 4, false);
 	
 	
 	@Test
 	public void testCreate() throws Exception {
 		//Arrange
 		//Converting our Test Object into a JSON string called bookingJson
-		String bookingJson = mapper.writeValueAsString(testBooking3);
+		String bookingJson = mapper.writeValueAsString(booking1);
 		
 		//Import RequestBuilder from Spring framework
 		//= Request type, e.g. get, push, post
@@ -73,7 +76,7 @@ public class ControllerTest {
 		//Making a ResultMatcher object (mvc thing), it is either true of false
 		//this depends on the status
 		ResultMatcher checkStatus = status(). isCreated(); //Is the status code of our request created(201)
-		ResultMatcher checkBody = content().string("Booking added with ID: 3"); //import in result string, referring to your test object in relation to the existing data in database
+		ResultMatcher checkBody = content().string("Booking added with ID: 5"); //import in result string, referring to your test object in relation to the existing data in database
 		
 		//Assert
 		//tell our mvc(postman mock) to run the request (click send)
@@ -81,24 +84,8 @@ public class ControllerTest {
 		//AND checkBody SHOULD Be true (response body is correct)
 		mvc.perform(req).andExpect(checkStatus).andExpect(checkBody);
 	}
-	
-	@Test
-	public void testGetId() throws Exception {
-		//Arrange
-		
-		String testBookingIDJson = mapper.writeValueAsString(testBookingID); //converting our obj (with id) to JSON
-		
-		//Act
-		//Passing in the path variable5, but is added as part of the string
-		
-		RequestBuilder req = get("/get/1");
-		ResultMatcher checkStatus = status().isAccepted(); //is the response status accepted?
-		ResultMatcher checkBody = content().json(testBookingIDJson);
-		
-		//Assert
-		mvc.perform(req).andExpect(checkStatus).andExpect(checkBody);
-	}
-	
+
+
 	@Test
 	public void testUpdate() throws Exception {
 		
@@ -124,7 +111,7 @@ public class ControllerTest {
 	public void testGetBookings()throws Exception{
 		//Arrange
 		
-		List<HolidayBooking> testListBookings = List.of(testBookingID, testBookingID2);
+		List<HolidayBooking> testListBookings = List.of(booking1ID, booking2ID, booking3ID, booking4ID);
 		String testListBookingsJson = mapper.writeValueAsString(testListBookings);
 		
 		//Act
@@ -163,6 +150,26 @@ public class ControllerTest {
 		mvc.perform(req).andExpect(checkStatus).andExpect(checkBody);
 		
 		
+	}
+	
+	@Test
+	public void testPostArray() throws Exception{
+		List<HolidayBooking> testList = List.of(booking1, booking2);
+		String bookingJson = mapper.writeValueAsString(testList);
+		RequestBuilder req = post("/postArray").contentType(MediaType.APPLICATION_JSON).content(bookingJson);
+		ResultMatcher checkStatus = status().isCreated();
+		ResultMatcher checkBody = content().string("Bookings have been created");
+		mvc.perform(req).andExpect(checkStatus).andExpect(checkBody);
+		
+	}
+	
+	@Test
+	public void testGetId() throws Exception{
+		String bookingJson = mapper.writeValueAsString(booking1ID);
+		RequestBuilder req = get("/get/1").contentType(MediaType.APPLICATION_JSON).content(bookingJson);
+		ResultMatcher checkStatus = status().isAccepted();
+		ResultMatcher checkBody = content().json(bookingJson);
+		mvc.perform(req).andExpect(checkStatus).andExpect(checkBody);
 	}
 	
 }
